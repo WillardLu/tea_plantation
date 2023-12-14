@@ -1,0 +1,91 @@
+\documentclass[oneside,fontset=founder]{ctexbook}
+
+\usepackage{geometry}% 用于页面设置
+\usepackage[dvipsnames, svgnames, x11names]{xcolor}% 颜色支持
+\usepackage{graphicx}% 图形支持
+\usepackage[
+  colorlinks=true,
+  linkcolor=Navy,
+  urlcolor=Navy,
+  citecolor=Navy,
+  anchorcolor=Navy
+]{hyperref}% 设置超链接颜色
+\usepackage{enumerate}% 枚举支持
+\usepackage{minted}% 代码显示支持
+
+% 纸张设置
+\geometry{
+  a4paper,
+  left = 1in,
+  right = 1in,
+  top = 1in,
+  bottom = 1in
+}
+
+% 设置章节标题左对齐，+=表示在原有格式上追加，如果只有=则表示完全替换
+\ctexset{
+  chapter/format += \raggedright,
+  section/format += \raggedright,
+  subsection/format += \raggedright,
+  subsubsection/format += \raggedright,
+}
+
+\emergencystretch = \maxdimen% 断字处理
+\setlength{\parindent}{2em}% 缩进
+\setlength{\parskip}{1ex} % 段间距
+
+% 定义颜色
+% \definecolor{pageYellow}{HTML}{F2F1D7}
+
+% \pagecolor{pageYellow}
+
+
+% ------------------ 开始 -------------------
+
+
+\begin{document}
+
+
+% ------------------ 封面 -------------------
+\begin{titlepage}%
+\begin{center}
+  \quad
+
+  \vspace{2ex}
+
+  \includegraphics[width=.4\textwidth]{images/cover.png}
+
+  \vspace{4ex}
+
+  \Huge\heiti C语言编程规范与风格指南\normalsize\normalfont
+
+  \vspace{4ex}
+
+  陆巍
+  \vfill%
+  % Bottom of the page
+  Youling Robotics
+
+  2023年12月14日
+\end{center}
+\end{titlepage}
+
+
+% ------------------ 前言 -------------------
+\frontmatter% 关闭章节序号，页码使用罗马数字
+
+
+\chapter{前言}
+
+
+
+% ------------------ 目录 -------------------
+\tableofcontents% 生成目录
+
+
+% ------------------ 正文 -------------------
+\mainmatter
+
+\include{part1}
+
+\end{document}
