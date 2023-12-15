@@ -1,3 +1,7 @@
+\chapter{包容性语言}
+在所有代码中，包括命名和注释，都要使用包容性语言，避免使用其他程序员可能认为不尊重或冒犯的术语（如“master”和“slave”、“blacklist”和“whitelist”或“redline”），即使这些术语表面上也有中性的含义。同样，使用中性语言，除非您指的是某个特定的人（并使用其代词）。例如，使用“they”/“them”/“their”来指性别不明的人（即使是单数），使用“it”/“its”来指软件、电脑和其他非人类的东西。
+
+
 \chapter{注释}
 注释对于保持代码的可读性绝对重要。以下规则说明了应该注释的内容和位置。但请记住：虽然注释非常重要，但最好的代码是自文档化的。为类型和变量赋予合理的名称比使用晦涩难懂的名称要好得多，因为你必须通过注释来解释这些名称。
 
@@ -34,7 +38,7 @@ if (receive_flag) /// if receive_flag is TRUE
 
 如下这种无价值的注释不应出现（空洞的笑话，无关紧要的注释）：
 \begin{minted}[linenos=true,frame=single,breaklines]{c}
-/// 时间有限，现在是:04，根本来不及想为什么，也没人能帮我说清楚
+/// 时间有限，现在是：04，根本来不及想为什么，也没人能帮我说清楚
 \end{minted}
 
 如下的注释则给出了有用的信息：
@@ -593,7 +597,7 @@ C++系统文件
 
 这种排序方式可有效减少隐藏依赖，我们希望每一个头文件独立编译。最简单的实现方式是将其作为第一个.h文件包含在对应的.cpp中。
 
-dir/foo.cpp和dir2/foo2.h通常位于相同目录下（像base/basictypes\_unittest.cpp和base/basictypes.h），但也可在不同目录下。
+dir/foo.cpp和dir2/foo2.h通常位于相同目录下（像 \verb|base/basictypes_unittest.cpp| 和 \verb|base/basictypes.h|），但也可在不同目录下。
 
 相同目录下头文件按字母序是不错的选择。
 
@@ -778,7 +782,7 @@ void SetForceModel(ForceModel *fm)
 
 
 \section{命名空间}
-命名空间的名称全小写，用下划线连接，其命名基于项目名称和目录结构。例如：google\_awesome\_project。
+命名空间的名称要全部小写，并用下划线连接，其命名基于项目名称和目录结构。例如：\verb|google_awesome_project|。
 
 
 \section{枚举}
@@ -794,3 +798,658 @@ enum Color {COLOR_RED, COLOR_GREEN, COLOR_BLUE};
 #define PI_ROUNDED 3.0
 MY_EXCITING_ENUM_VALUE
 \end{minted}
+
+
+\chapter{格式}
+整个项目服从统一的编程风格是很重要的，这样才能让所有人在阅读和理解代码时更加容易。
+
+
+\section{行长度}
+每一行代码字符数不超过 80。
+
+例外情况：
+\begin{itemize}
+	\item 如果一行注释包含了超过80字符的命令或URL，出于复制粘贴的方便可以超过80字符；
+	\item 包含长路径的可以超出80列，尽量避免；
+	\item 头文件保护可以无视该原则。
+\end{itemize}
+
+
+\section{非ASCII字符}
+非 ASCII 字符应该很少使用，而且必须使用 UTF-8 格式。
+
+不应在源代码中硬性编码面向用户的文本，即使是英文，因此应尽量少用非 ASCII 字符。不过，在某些情况下，在代码中包含此类字符是合适的。例如，如果您的代码要解析来自国外的数据文件，那么将这些数据文件中使用的非 ASCII 字符串作为分隔符进行硬编码可能是合适的。更常见的情况是，不需要本地化的 unittest 代码可能包含非 ASCII 字符串。在这种情况下，您应该使用 UTF-8，因为大多数能处理 ASCII 以外字符的工具都能理解这种编码。
+
+例如，"$\backslash$xEF$\backslash$xBB$\backslash$xBF"，或者更简单的"$\backslash$uFEFF"，是 Unicode 的零宽度无断点空格字符，如果直接以 UTF-8 编码包含在源代码中，就会看不见。
+
+尽可能避免使用 u8 前缀。从 C++20 开始，u8 前缀的语义与 C++17 有很大不同，它产生的是 char8\_t 数组，而不是 char 数组。
+
+您不应该使用 char16\_t 和 char32\_t 字符类型，因为它们用于非 UTF-8 文本。出于类似的原因，您也不应该使用 wchar\_t（除非您编写的代码与广泛使用 wchar\_t 的 Windows API 交互）。
+
+
+\section{缩进}
+只使用空格,每次缩进2个空格。不要在代码中使用tabs,设定编辑器将tab转为空格。
+
+
+\section{函数声明与定义}
+返回类型和函数名在同一行，合适的话，参数也放在同一行。
+
+函数看上去像这样：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+ReturnType ClassName::FunctionName(Type par_name1, Type par_name2) {
+  DoSomething();
+  ...
+}
+\end{minted}
+
+如果同一行文本较多，容不下所有参数：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+ReturnType ClassName::ReallyLongFunctionName(Type par_name1,
+                                             Type par_name2,
+                                             Type par_name3) {
+  DoSomething();
+  ...
+}
+\end{minted}
+甚至连第一个参数都放不下：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+ReturnType LongClassName::ReallyReallyReallyLongFunctionName(
+    Type par_name1, // 4 space indent
+    Type par_name2,
+    Type par_name3) {
+  DoSomething(); // 2 space indent
+  ...
+}
+\end{minted}
+
+注意以下几点：
+\begin{itemize}
+  \item 返回值总是和函数名在同一行；
+  \item 左圆括号总是和函数名在同一行；
+  \item 函数名和左圆括号间没有空格；
+  \item 圆括号与参数间没有空格；
+  \item 左大括号总在最后一个参数同一行的末尾处；
+  \item 右大括号总是单独位于函数最后一行；
+  \item 右圆括号和左大括号间总是有一个空格；
+  \item 函数声明和实现处的所有形参名称必须保持一致；
+  \item 所有形参应尽可能对齐；
+  \item 缺省缩进为2个空格；
+  \item 独立封装的参数保持4个空格的缩进。
+\end{itemize}
+
+如果函数为const的，关键字const应与最后一个参数位于同一行。
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+// Everything in this function signature fits on a single line
+ReturnType FunctionName(Type par) const {
+  ...
+}
+
+// This function signature requires multiple lines, but
+// the const keyword is on the line with the last parameter.
+ReturnType ReallyLongFunctionName(Type par1,
+                                  Type par2) const {
+  ...
+}
+\end{minted}
+
+如果有些参数没有用到，在函数定义处将参数名注释起来：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+// Always have named parameters in interfaces.
+class Shape {
+ public:
+  virtual void Rotate(double radians) = 0;
+}
+
+// Always have named parameters in the declaration.
+class Circle : public Shape {
+ public:
+  virtual void Rotate(double radians);
+}
+
+// Comment out unused named parameters in definitions.
+void Circle::Rotate(double /*radians*/) {}
+// Bad - if someone wants to implement later, it's not clear what the
+// variable means.
+void Circle::Rotate(double) {}
+\end{minted}
+
+
+\section{函数调用}
+尽量放在同一行，否则，将实参封装在圆括号中。
+
+函数调用遵循如下形式：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+bool retval = DoSomething(argument1, argument2, argument3);
+\end{minted}
+
+如果同一行放不下，可断为多行，后面每一行都和第一个实参对齐，左圆括号后和右圆括号前不要留空格：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+bool retval = DoSomething(averyveryveryverylongargument1,
+                          argument2, argument3);
+\end{minted}
+
+如果函数参数比较多,可以出于可读性的考虑每行只放一个参数:
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+bool retval = DoSomething(argument1,
+                          argument2,
+                          argument3,
+                          argument4);
+\end{minted}
+
+如果函数名太长,以至于超过行最大长度,可以将所有参数独立成行：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+if (...) {
+  ...
+  ...
+  if (...) {
+    DoSomethingThatRequiresALongFunctionName(
+        very_long_argument1, // 4 space indent
+        argument2,
+        argument3,
+        argument4);
+  }
+\end{minted}
+
+
+\section{条件语句}
+不在圆括号中添加空格，关键字 else 另起一行。
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+if (condition) { // no spaces inside parentheses
+  ... // 2 space indent.
+} else { // The else goes on the same line as the closing brace.
+  ...
+}
+\end{minted}
+
+if和左圆括号间有个空格，右圆括号和左大括号（如果使用的话）间也要有个空格：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+if(condition)    // Bad - space missing after IF.
+if (condition){  // Bad - space missing before {.
+if(condition){   // Doubly bad.
+if (condition) { // Good - proper space after IF and before {.
+\end{minted}
+
+有些条件语句写在同一行以增强可读性，只有当语句简单并且没有使用else子句时使用：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+if (x == kFoo) return new Foo();
+if (x == kBar) return new Bar();
+\end{minted}
+
+如果语句有 else 分支是不允许的：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+// Not allowed - IF statement on one line when there is an ELSE clause
+if (x) DoThis();
+else DoThat();
+\end{minted}
+
+通常，单行语句不需要使用大括号，如果你喜欢也无可厚非，也有人要求 if 必须使用大括号
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+if (condition)
+  DoSomething(); // 2 space indent.
+
+if (condition) {
+  DoSomething(); // 2 space indent.
+}
+\end{minted}
+
+但如果语句中哪一分支使用了大括号的话,其他部分也必须使用：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+// Not allowed - curly on IF but not ELSE
+if (condition) {
+  foo;
+} else
+  bar;
+
+// Not allowed - curly on ELSE but not IF
+if (condition)
+  foo;
+else {
+  bar;
+}
+
+// Curly braces around both IF and ELSE required because
+// one of the clauses used braces.
+if (condition) {
+  foo;
+} else {
+  bar;
+}
+\end{minted}
+
+
+\section{循环和开关选择语句}
+switch语句可以使用大括号分块；空循环体应使用{}或 continue。
+
+switch语句中的case块可以使用大括号也可以不用，取决于你的喜好，使用时要依下文所述。
+
+如果有不满足case枚举条件的值，要总是包含一个default（如果有输入值没有case去处理，编译器将报警）。如果default永不会执行，可以简单的使用assert：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+switch (var) {
+  case 0: { // 2 space indent
+  ...     // 4 space indent
+  break;
+  }
+  case 1: {
+  ...
+  break;
+  }
+  default: {
+  assert(false);
+  }
+}
+\end{minted}
+
+空循环体应使用{}或continue，而不是一个简单的分号：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+while (condition) {
+  // Repeat test until it returns false.
+}
+for (int i = 0; i < kSomeNumber; ++i) {} // Good - empty body.
+while (condition) continue; // Good - continue indicates no logic.
+while (condition); // Bad - looks like part of do/while loop.
+\end{minted}
+
+
+\section{指针和引用表达式}
+句点（.）或箭头（->）前后不要有空格，指针/地址操作符（*、\&）后不要有空格。
+
+下面是指针和引用表达式的正确范例：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+x = *p;
+p = &x;
+x = r.y;
+x = r->y;
+\end{minted}
+
+注意：
+
+1) 在访问成员时，句点或箭头前后没有空格；
+
+2) 指针操作符*或\&后没有空格。
+
+在声明指针变量或参数时，星号与类型或变量名紧挨都可以：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+// These are fine, space preceding.
+char *c;
+const string &str;
+
+// These are fine, space following.
+char* c;    // but remember to do "char* c, *d, *e, ...;"!
+const string& str;
+char * c;   // Bad - spaces on both sides of *
+const string & str; // Bad - spaces on both sides of &
+\end{minted}
+
+
+\section{布尔表达式}
+如果一个布尔表达式超过标准行宽（80 字符），如果断行要统一一下。
+
+下例中，逻辑与（\&\&）操作符总位于行尾：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+if (this_one_thing > this_other_thing &&
+    a_third_thing == a_fourth_thing &&
+    yet_another & last_one) {
+  ...
+}
+\end{minted}
+两个逻辑与（\&\&）操作符都位于行尾，可以考虑额外插入圆括号，合理使用的话对增强可读性是很有帮助的。
+
+
+\section{函数返回值}
+return表达式中不要使用圆括号。
+
+函数返回时不要使用圆括号：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+return x; // not return(x);
+\end{minted}
+
+
+\section{变量及数组初始化}
+选择=还是()。
+
+需要做二者之间做出选择，下面的形式都是正确的：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+int x = 3;
+int x(3);
+string name("Some Name");
+string name = "Some Name";
+\end{minted}
+
+
+\section{预处理指令}
+预处理指令不要缩进，从行首开始。
+
+即使预处理指令位于缩进代码块中，指令也应从行首开始。
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+// Good - directives at beginning of line
+  if (lopsided_score) {
+#if DISASTER_PENDING      // Correct -- Starts at beginning of line
+    DropEverything();
+#endif
+    BackToNormal();
+  }
+// Bad - indented directives
+  if (lopsided_score) {
+    #if DISASTER_PENDING // Wrong! The "#if" should be at beginning of
+line
+    DropEverything();
+    #endif              // Wrong! Do not indent "#endif"
+    BackToNormal();
+}
+\end{minted}
+
+
+\section{类格式}
+声明属性依次序是 public:、protected:、private:，每次缩进1个空格。类声明的基本格式如下：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+class MyClass : public OtherClass {
+ public:      // Note the 1 space indent!
+  MyClass();  // Regular 2 space indent.
+  explicit MyClass(int var);
+  ~MyClass() {}
+
+  void SomeFunction();
+  void SomeFunctionThatDoesNothing() {
+  }
+
+  void set_some_var(int var) { some_var_ = var; }
+  int some_var() const { return some_var_; }
+
+ private:
+  bool SomeInternalFunction();
+
+  int some_var_;
+  int some_other_var_;
+  DISALLOW_COPY_AND_ASSIGN(MyClass);
+};
+\end{minted}
+
+注意：
+\begin{itemize}
+  \item 所有基类名应在80列限制下尽量与子类名在同一行；
+  \item 关键词 public:、protected:、private:不缩进；
+  \item 除第一个关键词（一般是 public）外，其他关键词前空一行，如果类比较小的话也可以不空；
+  \item 这些关键词后不要空行；
+  \item public 放在最前面，然后是protected和private；
+\end{itemize}
+
+
+\section{初始化列表}
+构造函数初始化列表放在同一行或按四格缩进并排几行。
+
+两种可以接受的初始化列表格式：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+// When it all fits on one line:
+MyClass::MyClass(int var) : some_var_(var), some_other_var_(var + 1) {
+\end{minted}
+或
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+// When it requires multiple lines, indent 4 spaces, putting the colon on
+// the first initializer line:
+MyClass::MyClass(int var)
+    : some_var_(var),    // 4 space indent
+      some_other_var_(var + 1) { // lined up
+  ...
+  DoSomething();
+  ...
+}
+\end{minted}
+
+
+\section{命名空间格式化}
+命名空间内容不缩进。
+
+命名空间不添加额外缩进层次，例如：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+namespace {
+void foo() { // Correct. No extra indentation within namespace.
+  ...
+}
+} // namespace
+\end{minted}
+不要缩进：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+namespace {
+// Wrong. Indented when it should not be.
+  void foo() {
+    ...
+  }
+} // namespace
+\end{minted}
+
+
+\section{水平留白}
+水平留白的使用因地制宜。不要在行尾添加无谓的留白。
+
+\textbf{普通：}
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+void f(bool b) { // 左大括号之前总是有一个空格。
+  ...
+int i = 0; // 分号前通常没有空格。
+int x[] = {0};   // 数组初始化时大括号内不留空格。
+class Foo : public Bar {
+ public:
+  // 对于内联函数实现，在大括号和实现本身之间放置空格。
+  Foo(int b) : Bar(), baz_(b) {} // 空括号内没有空格。
+  void Reset() { baz_ = 0; } // 用空格分开大括号与实现。
+  ...
+\end{minted}
+
+添加冗余的留白会给其他人编辑时造成额外负担，因此，不要加入多余的空格。如果确定一行代码已经修改完毕，将多余的空格去掉；或者在专门清理空格时去掉（确信没有其他人在使用）。
+
+\textbf{循环和条件语句：}
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+if (b) {        // 在条件和循环的关键字之后加空格。
+} else {        // else左右都有空格。
+}
+while (test) {} // 圆括号内通常没有空格。
+switch (i) {
+for (int i = 0; i < 5; ++i) {
+switch ( i ) {  // 循环和条件可能在圆括号内有空格，但这很少见。注意保持一致。
+if ( test ) {
+for ( int i = 0; i < 5; ++i ) {
+for ( ; i < 5 ; ++i) { // For循环在分号后总是有一个空格，
+...                    // 并且在分号之前可能有一个空格。
+switch (i) {
+  case 1:                // switch语句内case中的冒号前没有空格。
+  ...
+  case 2: break;         // 如果后面有代码，则在冒号后面使用空格。
+\end{minted}
+
+\textbf{操作符：}
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+x = 0;              // 赋值运算符周围总是有空格。
+x = -5;             // 没有空格分隔一元运算符及其参数。
+++x;
+if (x && !y)
+  ...
+v = w * x + y / z;  // 二元运算符通常在它们周围有空格，
+v = w*x + y/z;      // 但是可以删除因子周围的空格。
+v = w * (x + z);    // 括号内应该没有空格。
+\end{minted}
+
+\textbf{模板和转换：}
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+vector<string> x;          // No spaces inside the angle
+y = static_cast<char*>(x); // brackets (< and >), before
+                           // <, or between >( in a cast.
+vector<char *> x;          // Spaces between type and pointer are
+                           // okay, but be consistent.
+set<list<string> > x;      // C++ requires a space in > >.
+set< list<string> > x;     // You may optionally make use
+                           // symmetric spacing in < <.
+\end{minted}
+
+
+\section{垂直留白}
+垂直留白越少越好。
+
+这不仅仅是规则而是原则问题了：不是非常有必要的话就不要使用空行。尤其是：不要在两个函数定义之间空超过2行，函数体头、尾不要有空行，函数体中也不要随意添加空行。
+
+基本原则是：同一屏可以显示越多的代码，程序的控制流就越容易理解。当然，过于密集的代码块和过于疏松的代码块同样难看，取决于你的判断，但通常是越少越好。
+
+函数头、尾不要有空行：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+void Function() {
+  // Unnecessary blank lines before and after
+}
+\end{minted}
+
+代码块头、尾不要有空行：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+while (condition) {
+  // Unnecessary blank line after
+}
+if (condition) {
+  // Unnecessary blank line before
+}
+\end{minted}
+
+
+\section{补充规定与说明}
+
+
+\subsection{多个短语句（包括赋值语句）不允许写在同一行内，即一行只写一条语句。}
+示例：
+
+不好的排版：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+int a = 5; int b= 10;
+\end{minted}
+
+好的排版：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+int a = 5;
+int b = 10;
+\end{minted}
+
+
+\subsection{逗号、分号只在后面加空格，双目操作符的前后要加空格，->与.前后不加空格。}
+
+
+\subsection{注释符与注释内容之间要用一个空格进行分隔。}
+
+
+\chapter{函数}
+
+
+\section{输入和输出}
+C++函数的输出一般情况下是通过返回值提供的，有时也通过输出参数（或输入/输出参数）提供。
+
+与输出参数相比，我们更倾向于使用返回值：返回值提高了可读性，通常还能提供相同或更好的性能。
+
+优先使用返回值，如果不行，则使用引用返回。避免返回指针，除非指针可以为空。
+
+参数既可以是函数的输入，也可以是函数的输出，或者两者兼而有之。非选项输入参数通常应为值或常量引用，而非选项输出和输入/输出参数通常应为引用（不能为空）。一般情况下，使用 std::optional 表示可选的副值输入，当非可选形式使用引用时，使用常量指针。使用非常量指针表示可选输出和可选输入/输出参数。
+
+避免定义要求常量引用参数在调用后仍然有效的函数，因为常量引用参数会绑定到临时变量。取而代之的是，找到消除生命周期要求的方法（例如，复制参数），或通过常量指针传递参数，并记录生命周期和非空要求。
+
+在对函数参数排序时，应将所有纯输入参数放在输出参数之前。特别是，不要因为是新参数就在函数末尾添加新参数；应将新的纯输入参数放在输出参数之前。这并不是一条硬性规定。既是输入参数又是输出参数会使问题变得更加复杂，而且与相关函数保持一致也可能要求您遵守这一规则。变异函数也可能需要不同寻常的参数排序。
+
+
+\section{编写简短的函数}
+首选小而集中的函数。
+
+我们认识到长函数有时也是合适的，因此对函数长度没有硬性限制。如果函数超过40行，请考虑是否可以在不影响程序结构的情况下将其拆分。
+
+即使你的长函数现在运行完美，几个月后有人修改它时也可能会添加新的行为。这可能会导致难以发现的错误。保持函数的简短会让其他人更容易阅读和修改你的代码。小函数也更容易测试。
+
+在使用某些代码时，您可能会发现函数又长又复杂。不要害怕修改现有的代码：如果使用这样的函数很困难，你发现错误很难调试，或者你想在几个不同的上下文中使用其中的一部分，可以考虑将函数分解成更小、更易于管理的部分。
+
+
+\section{函数重载}
+使用重载函数（包括构造函数）的前提是，读者在查看调用点时，无需首先弄清楚调用的是哪个重载函数，就能很好地了解发生了什么。
+
+
+\subsection{定义}
+您可以编写一个接收 const std::string\& 的函数，然后用另一个接收 const char* 的函数来重载它。不过，在这种情况下，可以考虑使用 std::string\_view 代替它。
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+class MyClass {
+ public:
+  void Analyze(const std::string &text);
+  void Analyze(const char *text, size_t textlen);
+};
+\end{minted}
+
+
+\subsection{优点}
+重载可以使代码更直观，因为它允许名称相同的函数接受不同的参数。重载对于模板化代码来说可能是必要的，对于访问者来说也很方便。
+
+基于 const 或 ref 限定的重载可以使实用程序代码更易用、更高效，或两者兼而有之。
+
+
+\subsection{缺点}
+如果一个函数仅通过参数类型就被重载，读者可能需要理解 C++ 复杂的匹配规则才能知道发生了什么。此外，如果派生类只重载函数的部分变体，很多人也会对继承的语义感到困惑。
+
+
+\subsection{抉择}
+当函数变体之间没有语义差异时，您可以重载函数。这些重载可能在类型、限定符或参数数量上有所不同。不过，这种调用的读取者不需要知道选择的是重载集的哪个成员，只需要知道调用的是重载集中的某个成员。如果在重载集中的所有条目中都能用一个注释记录下来，那就表明这是一个设计良好的重载集。
+
+
+\section{默认参数}
+非虚拟函数允许使用默认参数，但默认值必须保证始终相同。请遵循与函数重载相同的限制，如果默认参数带来的可读性不足以抵消以下缺点，则应优先使用重载函数。
+
+
+\subsection{优点}
+通常情况下，你有一个使用默认值的函数，但偶尔你想覆盖默认值。默认参数提供了一种简单的方法来实现这一目的，而不必为罕见的例外情况定义许多函数。与重载函数相比，默认参数的语法更简洁，模板更少，"必填 "和 "可选 "参数之间的区别也更明显。
+
+
+\subsection{缺点}
+默认参数是实现重载函数语义的另一种方法，因此所有不重载函数的理由都适用。
+
+虚函数调用中参数的默认值由目标对象的静态类型决定，而且无法保证特定函数的所有重载都声明相同的默认值。
+
+默认参数在每次调用时都要重新评估，这会导致生成的代码臃肿。读者也可能希望默认值在声明时是固定的，而不是在每次调用时变化。
+
+在存在默认参数的情况下，函数指针会令人困惑，因为函数签名往往与调用签名不一致。添加函数重载可以避免这些问题。
+
+
+\subsection{抉择}
+禁止在虚拟函数中使用缺省参数，因为在虚拟函数中，缺省参数无法正常工作，而且在某些情况下，指定的缺省参数可能会因求值时间的不同而产生不同的值。(例如，不要写 void f(int n = counter++);.
+
+在其他一些情况下，默认参数可以提高函数声明的可读性，足以克服上述缺点，因此允许使用默认参数。如果有疑问，请使用重载。
+
+
+\section{拖尾返回类型语法}
+只有在使用普通语法（前导返回类型）不切实际或可读性较差的情况下，才使用尾随返回类型。
+
+
+\subsection{定义}
+C++ 允许两种不同形式的函数声明。在较早的形式中，返回类型出现在函数名之前。例如：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+int foo(int x);
+\end{minted}
+
+较新的形式是在函数名之前使用 auto 关键字，在参数列表之后使用拖尾返回类型。例如，上面的声明可以写成：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+auto foo(int x) -> int;
+\end{minted}
+
+拖尾返回类型在函数的作用域中。对于 int 这样的简单情况，这并没有什么区别，但对于更复杂的情况，如在类作用域中声明的类型或以函数参数形式编写的类型，这就很重要了。
+
+
+\subsection{优点}
+拖尾返回类型是明确指定 lambda 表达式返回类型的唯一方法。在某些情况下，编译器可以推断出 lambda 的返回类型，但并非所有情况都是如此。即使编译器可以自动推导出返回类型，有时明确指定返回类型对读者来说也会更清晰。
+
+有时，在函数的参数列表出现后再指定返回类型会更简单、更易读。当返回类型依赖于模板参数时尤其如此。例如：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+    template <typename T, typename U>
+    auto add(T t, U u) -> decltype(t + u);
+\end{minted}
+与
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+    template <typename T, typename U>
+    decltype(declval<T&>() + declval<U&>()) add(T t, U u);
+\end{minted}
+
+
+\subsection{缺点}
+拖尾返回类型语法相对较新，在 C++ 类语言（如 C 和 Java）中没有类似的语法，因此有些读者可能会感到陌生。
+
+现有的代码库中有大量的函数声明，这些声明不会被修改为使用新语法，因此现实的选择是只使用旧语法或混合使用这两种语法。使用单一版本更有利于统一风格。
+
+
+\subsection{抉择}
+在大多数情况下，继续使用旧的函数声明样式，即返回类型放在函数名之前。只有在必要的情况下（如 lambdas），或者通过将类型放在函数的参数列表之后，可以以更易读的方式编写类型的情况下，才使用新的跟踪返回类型形式。后一种情况应该很少见；这主要是在相当复杂的模板代码中出现的问题，在大多数情况下都不鼓励使用。
+
+
