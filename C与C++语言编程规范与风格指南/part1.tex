@@ -1,0 +1,796 @@
+\chapter{注释}
+注释对于保持代码的可读性绝对重要。以下规则说明了应该注释的内容和位置。但请记住：虽然注释非常重要，但最好的代码是自文档化的。为类型和变量赋予合理的名称比使用晦涩难懂的名称要好得多，因为你必须通过注释来解释这些名称。
+
+在写注释时，要为你的读者而写，即下一个需要理解你的代码的贡献者。然而现实中往往下一位读者就是你自己！
+
+
+\section{优秀的代码可以自我解释，不通过注释即可轻易读懂。}
+优秀的代码不写注释也可轻易读懂，注释无法把糟糕的代码变好，需要很多注释来解释的代码往往存在坏味道，需要重构。
+
+这条规则所包含的内容实际上很多，这里只是简单的列出，细节则包含在编程中的方方面面。
+
+\section{注释风格}
+一律使用“///”（注意，是三条）来注释。即使内容跨越多行，也同样如此。可能大家在写大段注释时觉得这样不方便，是的，就是故意让人觉得不方便，以免把写注释当成写小说，注释要简洁。
+
+
+\section{一般规则}
+
+\subsection{注释的内容要清楚、明了，含义准确，防止二义性。}
+
+\subsection{注释解释代码难以直接表达的意图，而不是重复描述代码。}
+注释的目的是解释代码的设计意图、功能和采用的方法，提供代码以外的信息，帮助读者理解代码，防止没必要的重复注释信息。
+
+对于实现代码中巧妙的、晦涩的、有趣的、重要的地方加以注释。
+
+注释不是为了名词解释（what），而是说明用途（why）。
+
+\textbf{示例}
+
+如下注释纯属多余：
+\begin{minted}[linenos=true,frame=single,breaklines]{c}
+++i; /// increment i
+if (receive_flag) /// if receive_flag is TRUE
+\end{minted}
+
+如下这种无价值的注释不应出现（空洞的笑话，无关紧要的注释）：
+\begin{minted}[linenos=true,frame=single,breaklines]{c}
+/// 时间有限，现在是:04，根本来不及想为什么，也没人能帮我说清楚
+\end{minted}
+
+如下的注释则给出了有用的信息：
+\begin{minted}[linenos=true,frame=single,breaklines]{c}
+/// 由于xx编号网上问题，在xx情况下，芯片可能存在写错误，此芯片进行写操作后，必须进行回读校
+/// 验，如果回读不正确，需要再重复写-回读操作，最多重复三次，这样可以解决绝大多数网上应用时
+/// 的写错误问题
+int time = 0;
+do {
+  write_reg(some_addr, value);
+  time++;
+} while ((read_reg(some_addr) != value) && (time < 3));
+\end{minted}
+
+对于实现代码中巧妙的、晦涩的、有趣的、重要的地方加以注释，出彩的或复杂的代码块前要加注释：
+\begin{minted}[linenos=true,frame=single,breaklines]{c}
+/// Divide result by two, taking into account that x contains the carry from the add.
+for (int i = 0; i < result->size(); i++)
+{
+  x = (x << 8) + (*result)[i];
+  (*result)[i] = x >> 1;
+  x &= 1;
+}
+\end{minted}
+
+
+\subsection{修改代码时，维护代码周边的所有注释，以保证注释与代码的一致性。不再有用的注释要删除。}
+
+
+\subsection{注释应放在其代码上方相邻位置或右方，不可放在下面。如放于上方则需与其上面的代码用空行隔开，且与下方代码缩进相同。}
+
+
+\subsection{对于switch语句下的case语句，如果因为特殊情况需要处理完一个case后进入下一个case处理，必须在该case语句处理完、下一个case语句前加上明确的注释。}
+这样比较清楚程序编写者的意图，有效防止无故遗漏break语句。
+
+示例：
+\begin{minted}[linenos=true,frame=single,breaklines]{c}
+case CMD_FWD:
+  ProcessFwd();
+  /// now jump into case CMD_A
+case CMD_A:
+  ProcessA();
+  break;
+  /// 对于中间无处理的连续case，已能较清晰说明意图，不强制注释。
+switch (cmd_flag) {
+case CMD_A:
+case CMD_B:
+    {
+      ProcessCMD();
+      break;
+    }
+    ...
+}
+\end{minted}
+
+
+\subsection{避免在注释中使用缩写，除非是业界通用或子系统内标准化的缩写。}
+
+
+\subsection{避免在一行代码或表达式的中间插入注释。}
+
+
+\subsection{注释应考虑程序易读及外观排版的因素，使用的语言若是汉、英兼有的，建议多使用汉语，除非能用非常流利准确的英语表达。对于有外籍员工的，由产品确定注释语言。}
+
+
+\subsection{标点、拼写和语法应按照所用语言的习惯进行书写。}
+
+
+\subsection{注释格式采用doxygen可识别的格式。}
+
+
+\subsection{TODO待办注释}
+对那些临时的、短期的解决方案，或已经够好但并不完美的代码使用TODO注释。
+
+这样的注释要使用全大写的字符串TODO，后面括号（parentheses）里加上你的大名、邮件地址等，还可以加上冒号（colon）：目的是可以根据统一的TODO格式进行查找：
+\begin{minted}[linenos=true,frame=single,breaklines]{c}
+/// TODO(kl@gmail.com): Use a "*" here for concatenation operator.
+/// TODO(Zeke) change this to use relations.
+\end{minted}
+
+
+如果加上是为了在“将来某一天做某事”，可以加上一个特定的时间（"Fix by November 2025"）或事件（"Remove this code when all clients can handle XML responses."）。
+
+
+\section{文件注释}
+在每一个手工编写的文件开头加入文件注释。注释必须列出：版权说明、版本号、生成日期、作者姓名、内容、功能说明、修改日志等。格式如下：
+\begin{minted}[linenos=true,frame=single,breaklines]{c}
+/// ---------------------------------------------------------------------
+/// @file 本文件的文件名
+/// @brief 本文件实现功能的简述
+/// @details 详细描述
+/// @copyright 版权声明
+/// @author 作者
+/// @version 版本
+/// @date 创建日期
+/// 修改日志
+/// ---------------------------------------------------------------------
+\end{minted}
+
+示例：
+\begin{minted}[linenos=true,frame=single,breaklines]{c}
+/// ---------------------------------------------------------------------
+/// @file config.hpp
+/// @brief configuration file
+/// @copyright Copyright (c) 2008-2020, by Google. All rights reserved.
+/// @author Charles Martin
+/// @version 1.0.0
+/// @date May 20, 2009
+/// ---------------------------------------------------------------------
+\end{minted}
+
+对于开源项目，一般采用下面的方式来注释：
+\begin{minted}[linenos=true,frame=single,breaklines]{c}
+/// @copyright Copyright 2023 Willard Lu
+///
+/// Use of this source code is governed by an MIT-style
+/// license that can be found in the LICENSE file or at
+/// https://opensource.org/licenses/MIT.
+\end{minted}
+可以根据实际需要，添加各种说明，例如版本号。
+
+通常，头文件要对所声明的类的功能和用法作简单说明，.cpp文件包含了更多的实现细节或算法讨论，如果感觉这些实现细节或算法讨论对于阅读有帮助，可以把.cpp中的注释放到.h中，并在.cpp中指出文档在.h中。
+
+不要单纯在.h和.cpp间复制注释，复制的注释偏离了实际意义。
+
+
+\section{类注释}
+每个非显而易见的类声明都应带有随附的注释，以说明其用途以及应如何使用它。格式如下：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+/// @class 类名
+/// @brief 类的简单概述
+/// ＠details 详细概述。
+class Test {
+  ...
+}
+\end{minted}
+
+类注释应该为读者提供足够的信息，让他们知道如何以及何时使用类，以及正确使用类所必需的其他注意事项。如果类有任何同步前提需要说明。如果类的实例可以被多个线程访问，那么要特别注意记录多线程使用的规则和不变项。
+
+如有需要，可在注释中附上一段简单的示例代码。
+
+对于需要注释的枚举、结构，也使用同样的注释格式。
+
+
+\section{函数注释}
+函数声明处注释描述函数功能，定义处描述函数实现。
+
+\subsection{函数声明}
+几乎每个函数声明的前面都应该有注释，用来描述函数的功能和使用方法。只有当函数简单且明显时，这些注释才可以省略。注释使用描述式（"Opens the file"）而非指令式（"Open the file"）；注释只是为了描述函数而不是告诉函数做什么。通常，注释不会描述函数如何实现，那是定义部分的事情。
+
+函数声明处注释的内容：
+\begin{enumerate}[1）]
+\item inputs（输入）及outputs（输出）；
+\item 如果函数分配了空间，需要由调用者释放；
+\item 参数是否可以为NULL；
+\item 是否存在函数使用的性能隐忧（performance implications）;
+\item 如果函数是可重入的（re-entrant），其同步前提（synchronization assumptions）是什么？
+\end{enumerate}
+
+示例：
+\begin{minted}[linenos=true,frame=single,breaklines]{c}
+/// @brief 在光标的当前位置打印字符
+///
+/// 如果字符是换行符('\n')，光标应该移动到下一行(必要时滚动)。如果字符是一个回车('\r')，
+/// 光标应该立即重置为当前行的开头，从而导致任何未来的输出覆盖该行上的任何现有输出。
+/// 如果遇到退格符 ('\b')，应该擦除前面的字符(在其上写一个空格并将光标移回一列)。
+///
+/// @param ch 要打印的字符
+/// @return 输入字符
+int PutByte(char ch);
+\end{minted}
+
+注意，不要过于啰嗦，也不要说完全显而易见的事情。
+
+
+\subsection{函数定义}
+如果某个函数的工作方式有些麻烦，则该函数定义应有一个解释性注释。例如，在定义注释中，可能会描述使用的任何编码技巧，概述所经历的步骤，或者解释为什么选择了以自己的方式实现功能而不是使用可行的替代方法。
+
+注意，您不应该只是在.h文件或其他地方重复函数声明中给出的注释。简单地概括一下函数的功能是可以的，但是注释的重点应该是它是如何实现的。
+
+
+\section{变量注释}
+通常变量名本身足以很好说明变量用途,特定情况下,需要额外注释说明。
+
+
+\subsection{类数据成员}
+每个类数据成员（也叫实例变量或成员变量）应注释说明用途，如果变量可以接受NULL或-1等警戒值（sentinel values），须说明。
+
+
+\subsection{全局变量（常量）}
+全局变量要有较详细的注释，包括对其功能、取值范围以及存取时注意事项等的说明。例如：
+\begin{minted}[linenos=true,frame=single,breaklines]{c}
+/// The ErrorCode when SCCP translate
+/// Global Title failure, as follows    变量作用、含义
+/// 0 -SUCCESS    1 -GT Table error
+/// 2 -GT error Others -no use          变量取值范围
+/// only function SCCPTranslate() in
+/// this modual can modify it, and other
+/// module can visit it through call
+/// the function GetGTTransErrorCode()  使用方法
+BYTE g_GTTranErrorCode;
+\end{minted}
+
+
+\section{实现注释}
+对于实现代码中巧妙的、晦涩的、有趣的、重要的地方加以注释。
+
+
+\subsection{代码前注释}
+出彩的或复杂的代码块前要加注释，如：
+\begin{minted}[linenos=true,frame=single,breaklines]{c}
+/// Divide result by two, taking into account that x
+/// contains the carry from the add.
+for (int i = 0; i < result->size(); i++) {
+  x = (x << 8) + (*result)[i];
+  (*result)[i] = x >> 1;
+  x &= 1;
+}
+\end{minted}
+
+
+\subsection{行注释}
+比较隐晦的地方要在行尾加入注释，可以在代码之后空两格加行尾注释，如：
+\begin{minted}[linenos=true,frame=single,breaklines]{c}
+/// If we have enough memory, mmap the data portion too.
+mmap_budget = max<int64>(0, mmap_budget - index_->length());
+if (mmap_budget >= data_size_ && !MmapData(mmap_chunk_bytes, mlock))
+return; /// Error already logged.
+\end{minted}
+
+注意，有两块注释描述这段代码，当函数返回时注释提及错误已经被记入日志。
+
+前后相邻几行都有注释，可以适当调整使之可读性更好：
+\begin{minted}[linenos=true,frame=single,breaklines]{c}
+...
+DoSomething();                  /// Comment here so the comments line up.
+DoSomethingElseThatIsLonger();  /// Comment here so there are two spaces
+                                /// between the code and the comment.
+...
+\end{minted}
+
+
+\subsection{函数参数注释}
+当函数参数的含义不明显时，请考虑以下补救措施之一：
+\begin{itemize}
+\item 如果参数是一个字面常量，并且在多个函数调用中以默认相同的方式使用相同的常量，那么应该使用一个命名常量来显式地表示约束，并确保它是有效的。
+\item 考虑更改函数签名，以用枚举参数替换布尔参数。这将使参数值能够自我描述。
+\item 对于具有多个配置选项的函数，可以考虑定义单个类或结构来保存所有选项，并传递一个实例。这种方法有几个优点。在调用点上，选项是通过名称引用的，这澄清了它们的含义。它还减少了函数的参数计数，这使得函数调用更容易读写。另一个好处是，当您添加另一个选项时，您不必更改调用点。
+\item 将大型或复杂的嵌套表达式替换为命名变量。
+\item 作为最后的选择，请使用注释来澄清调用点上的参数含义。
+\end{itemize}
+
+考虑下面的例子:
+\begin{minted}[linenos=true,frame=single,breaklines]{c}
+/// What are these arguments?
+const DecimalNumber product = CalculateProduct(values, 7, false, nullptr);
+\end{minted}
+与：
+\begin{minted}[linenos=true,frame=single,breaklines]{c}
+ProductOptions options;
+options.set_precision_decimals(7);
+options.set_use_cache(ProductOptions::kDontUseCache);
+const DecimalNumber product =
+    CalculateProduct(values, options, /*completion_callback=*/nullptr);
+\end{minted}
+
+
+\subsection{不要做的事}
+不要陈述显而易见的事情。特别是，不要逐字地描述代码的功能，除非此行为对精通c++的读者来说并不明显。相反，应该提供更高级的注释来描述为什么代码要这样做，或者使代码自描述。
+
+比较下面两段代码中的注释：
+\begin{minted}[linenos=true,frame=single,breaklines]{c}
+/// Find the element in the vector.  <-- Bad: obvious!
+auto iter = std::find(v.begin(), v.end(), element);
+if (iter != v.end()) {
+  Process(element);
+}
+\end{minted}
+\begin{minted}[linenos=true,frame=single,breaklines]{c}
+/// Process "element" unless it was already processed.
+auto iter = std::find(v.begin(), v.end(), element);
+if (iter != v.end()) {
+  Process(element);
+}
+\end{minted}
+自描述代码不需要注释。来自上面例子的注释是显而易见的:
+\begin{minted}[linenos=true,frame=single,breaklines]{c}
+if (!IsAlreadyProcessed(element)) {
+  Process(element);
+}
+\end{minted}
+
+
+\chapter{头文件}
+头文件的设计体现了大部分的系统设计。不合理的头文件布局是编译时间过长的根本原因，不合理的头文件实际上反映了不合理的设计。
+
+\textbf{依赖}：这里特指编译依赖。若x.h包含了y.h，则称作x依赖y。依赖关系会进行传导，如x.h包含y.h，而y.h又包含了z.h，则x通过y依赖了z。依赖将导致编译时间的上升。虽然依赖是不可避免的，也是必须的，但是不良的设计会导致整个系统的依赖关系无比复杂，使得任意一个文件修改都要重新编译整个系统，导致编译时间巨幅上升。
+
+在一个设计良好的系统中，修改一个文件，只需要重新编译数个，甚至是一个文件。
+
+某产品曾经做过一个实验，把所有函数的实现通过工具注释掉，其编译时间只减少了不到10\%，究其原因，在于A包含B，B包含C，C包含D，最终几乎每一个源文件都包含了项目组所有的头文件，从而导致绝大部分编译时间都花在解析头文件上。
+
+某产品更有一个“优秀实践”，用于将.c文件通过工具合并成一个比较大的.c文件，从而大幅度提高编译效率。其根本原因还是在于通过合并.c文件减少了头文件解析次数。但是，这样的“优秀实践”是对合理划分.c文件的一种破坏。
+
+大部分产品修改一处代码，都得需要编译整个工程，对于TDD之类的实践，要求对于模块级别的编译时间控制在秒级，即使使用分布式编译也难以实现，最终仍然需要合理的划分头文件、以及头文件之间的包含关系，从根本上降低编译时间。
+
+合理的头文件划分体现了系统设计的思想，但是从编程规范的角度看，仍然有一些通用的方法用来合理规划头文件。
+
+
+\section{一些原则}
+
+
+\subsection{头文件中适合放置接口的声明，不适合放置实现。}
+说明：头文件是模块（Module）或单元（Unit）的对外接口。头文件中应放置对外部的声明，如对外提供的函数声明、宏定义、类型定义等。
+
+内部使用的函数（相当于类的私有方法）声明不应放在头文件中。
+
+内部使用的宏、枚举、结构定义不应放入头文件中。
+
+变量定义不应放在头文件中，应放在.c文件中。
+
+变量的声明尽量不要放在头文件中，亦即尽量不要使用全局变量作为接口。变量是模块或单元的内部实现细节，不应通过在头文件中声明的方式直接暴露给外部，应通过函数接口的方式进行对外暴露。 即使必须使用全局变量，也只应当在.c中定义全局变量，在.h中仅声明变量为全局的。
+
+
+\subsection{头文件应当职责单一}
+说明：头文件过于复杂，依赖过于复杂是导致编译时间过长的主要原因。 很多现有代码中头文件过大，职责过多， 再加上循环依赖的问题，可能导致为了在.c中使用一个宏，而包含十几个头文件。
+
+示例：如下是某平台定义WORD类型的头文件：
+\begin{minted}[linenos=true,frame=single,breaklines]{c}
+#include <VXWORKS.H>
+#include <KERNELLIB.H>
+#include <SEMLIB.H>
+#include <INTLIB.H>
+#include <TASKLIB.H>
+#include <MSGQLIB.H>
+#include <STDARG.H>
+#include <FIOLIB.H>
+#include <STDIO.H>
+#include <STDLIB.H>
+#include <CTYPE.H>
+#include <STRING.H>
+#include <ERRNOLIB.H>
+#include <TIMERS.H>
+#include <MEMLIB.H>
+#include <TIME.H>
+#include <WDLIB.H>
+#include <SYSLIB.H>
+#include <TASKHOOKLIB.H>
+#include <REBOOTLIB.H>
+...
+typedef unsigned short WORD;
+...
+\end{minted}
+这个头文件不但定义了基本数据类型WORD，还包含了stdio.h、syslib.h等等不常用的头文件。如果工程中有10000个源文件，而其中100个源文件使用了stdio.h的printf，由于上述头文件的职责过于庞大而WORD又是每一个文件必须包含的，从而导致stdio.h/syslib.h等可能被不必要的展开了9900次，大大增加了工程的编译时间。
+
+
+\subsection{头文件应向稳定的方向包含}
+说明：头文件的包含关系是一种依赖，一般来说，应当让不稳定的模块依赖稳定的模块，从而当不稳定的模块发生变化时，不会影响（编译）稳定的模块。
+
+就我们的产品（华为）来说，依赖的方向应该是：\textbf{产品依赖于平台，平台依赖于标准库}。某产品线平台的代码中已经包含了产品的头文件，导致平台无法单独编译、发布和测试，是一个非常糟糕的反例。
+
+\textbf{除了不稳定的模块依赖于稳定的模块外，更好的方式是两个模块共同依赖于接口}，这样任何一个模块的内部实现更改都不需要重新编译另外一个模块。在这里，我们假设接口本身是最稳定的。
+
+在敏捷开发中对此另有更透彻的说明，这里暂时参照华为与Google公司的内容。
+
+
+\section{一些规则}
+
+\subsection{每一个.c文件应有一个同名.h文件，用于声明需要对外公开的接口。}
+说明：如果一个.c文件不需要对外公布任何接口，则其就不应当存在，除非它是程序的入口，如main函数所在的文件。
+
+现有某些产品中，习惯一个.c文件对应两个头文件，一个用于存放对外公开的接口，一个用于存放内部需要用到的定义、声明等，以控制.c文件的代码行数。不提倡这种风格。这种风格的根源在于源文件过大，应首先考虑拆分.c文件，使之不至于太大。另外，一旦把私有定义、声明放到独立的头文件中，就无法从技术上避免别人include之，难以保证这些定义最后真的只是私有的。
+
+本规则反过来并不一定成立。有些特别简单的头文件，如命令ID定义头文件，不需要有对应的.c存在。
+
+示例：对于如下场景，如在一个.c中存在函数调用关系：
+\begin{minted}[linenos=true,frame=single,breaklines]{c}
+void foo() {
+  bar();
+}
+
+void bar() {
+  Do something;
+}
+\end{minted}
+
+必须在foo之前声明bar，否则会导致编译错误。
+
+这一类的函数声明，应当在.c的头部声明，并声明为static的，如下：
+\begin{minted}[linenos=true,frame=single,breaklines]{c}
+static void bar();
+
+void foo() {
+  bar();
+}
+
+void bar() {
+  Do something;
+}
+\end{minted}
+
+
+\subsection{禁止头文件循环依赖。}
+说明：头文件循环依赖，指a.h包含b.h， b.h包含c.h，c.h包含a.h之类导致任何一个头文件修改，都导致所有包含了a.h/b.h/c.h的代码全部重新编译一遍。而如果是单向依赖，如a.h包含b.h，b.h包含
+c.h，而c.h不包含任何头文件，则修改a.h不会导致包含了b.h/c.h的源代码重新编译。
+
+
+\subsection{.c/.h文件禁止包含用不到的头文件。}
+说明：很多系统中头文件包含关系复杂，开发人员为了省事起见，可能不会去一一钻研，直接包含一切想到的头文件，甚至有些产品干脆发布了一个god.h，其中包含了所有头文件，然后发布给各个项目组使用，这种只图一时省事的做法，导致整个系统的编译时间进一步恶化，并对后来人的维护造成了巨大的麻烦。
+
+
+\subsection{头文件应当自包含}
+说明：简单的说，自包含就是任意一个头文件均可独立编译。 如果一个文件包含某个头文件，还要包含另外一个头文件才能工作的话，就会增加交流障碍，给这个头文件的用户增添不必要的负担。
+
+示例：
+
+如果a.h不是自包含的，需要包含b.h才能编译，会带来的危害：
+
+每个使用a.h头文件的.c文件，为了让引入的a.h的内容编译通过，都要包含额外的头文件b.h。额外的头文件b.h必须在a.h之前进行包含，这在包含顺序上产生了依赖。
+
+注意：该规则需要与“.c/.h文件禁止包含用不到的头文件”规则一起使用，不能为了让a.h自包含，而在a.h中包含不必要的头文件。a.h要刚刚可以自包含，不能在a.h中多包含任何满足自包含之外的其他头文件。
+
+
+\subsection{总是编写内部\#include保护符（\#define保护）。}
+说明：多次包含一个头文件可以通过认真的设计来避免。如果不能做到这一点，就需要采取阻止头文件内容被包含多于一次的机制。
+
+通常的手段是为每个文件配置一个宏，当头文件第一次被包含时就定义这个宏，并在头文件被再次包含时使用它以排除文件内容。
+
+所有头文件都应该使用\#define防止头文件被多次包含，命名格式为：
+
+<PROJECT>\_<PATH>\_<FILE>\_H\_
+
+为保证唯一性，头文件的命名应基于其所在项目源代码树的全路径。例如项目foo中的头文件 foo/src/bar/baz.h按如下方式保护:
+\begin{minted}[linenos=true,frame=single,breaklines]{c}
+#ifndef FOO_BAR_BAZ_H_
+#define FOO_BAR_BAZ_H_
+...
+#endif // FOO_BAR_BAZ_H_
+\end{minted}
+
+注意：没有在宏最前面加上单下划线"\_"，是因为一般以单下划线"\_"和双下划线"\_\_"开头的标识符为ANSI C等使用，在有些静态检查工具中，若全局可见的标识符以"\_"开头会给出警告。
+
+定义保护符时，应该遵守两条规则：一是保护符使用唯一名称；二是不要在受保护部分的前后放置代码或者注释。
+
+例外情况：头文件的版权声明部分以及头文件的整体注释部分（如阐述此头文件的开发背景、使用注意事项等）可以放在保护符(\#ifndef XX\_H\_)前面。
+
+
+\subsection{禁止在头文件中定义变量。}
+说明：在头文件中定义变量，将会由于头文件被其他.c文件包含而导致变量重复定义。
+
+
+\subsection{只能通过包含头文件的方式使用其他.c提供的接口，禁止在.c中通过extern的方式使用外部函数接口、变量。}
+说明：若a.c使用了b.c定义的foo()函数，则应当在b.h中声明extern int foo(int input)；并在a.c中通过\#include <b.h>来使用foo。禁止通过在a.c中直接写extern int foo(int input);来使用foo，后面这种写法容易在foo改变时可能导致声明和定义不一致。
+
+
+\subsection{禁止在extern "C"中包含头文件。}
+说明：在extern "C"中包含头文件，会导致extern "C"嵌套，Visual Studio对extern "C"嵌套层次有限制，嵌套层次太多会编译错误。在extern "C"中包含头文件，可能会导致被包含头文件的原有意图遭到破坏。例如，存在a.h和b.h两个头文件：
+\begin{minted}[linenos=true,frame=single,breaklines]{c}
+#ifndef A_H_
+#define A_H_
+
+#ifdef __cplusplus
+void foo(int);
+#define a(value) foo(value)
+#else
+void a(int)
+#endif
+
+#endif // A_H_
+\end{minted}
+\begin{minted}[linenos=true,frame=single,breaklines]{c}
+#ifndef B_H_
+#define B_H_
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include "a.h"
+void b();
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif // B_H_
+\end{minted}
+
+使用C++预处理器展开b.h，将会得到
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+extern "C" {
+  void foo(int);
+  void b();
+}
+\end{minted}
+
+按照a.h作者的本意，函数foo是一个C++自由函数，其链接规范为"C++"。但在b.h中，由于\#include "a.h"被放到了extern "C" { }的内部，函数foo的链接规范被不正确地更改了。
+
+示例：错误的使用方式：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+extern “C”
+{
+#include “xxx.h”
+...
+}
+\end{minted}
+
+正确的使用方式：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+#include “xxx.h”
+extern “C”
+{
+...
+}
+\end{minted}
+
+
+\section{一些建议}
+
+\subsection{一个模块通常包含多个.c文件，建议放在同一个目录下，目录名即为模块名。为方便外部使用者，建议每一个模块提供一个.h，文件名为目录名。}
+说明：需要注意的是，这个.h并不是简单的包含所有内部的.h，它是为了模块使用者的方便，对外整体提供的模块接口。
+
+以Google test（简称GTest）为例，GTest作为一个整体对外提供C++单元测试框架，其1.5版本的gtest工程下有6个源文件和12个头文件。但是它对外只提供一个gtest.h，只要包含gtest.h即可使用GTest提供的所有对外提供的功能，使用者不必关心GTest内部各个文件的关系，即使以后GTest的内部实现改变了，比如把一个源文件c拆成两个源文件，使用者也不必关心，甚至如果对外功能不变，连重新编译都不需要。
+
+对于有些模块，其内部功能相对松散，可能并不一定需要提供这个.h，而是直接提供各个子模块或者.c的头文件。
+
+比如产品普遍使用的VOS，作为一个大模块，其内部有很多子模块，他们之间的关系相对比较松散，就不适合提供一个vos.h。而VOS的子模块，如Memory（仅作举例说明，与实际情况可能有所出入），其内部实现高度内聚，虽然其内部实现可能有多个.c和.h，但是对外只需要提供一个Memory.h声明接口。
+
+
+\subsection{如果一个模块包含多个子模块，则建议每一个子模块提供一个对外的.h，文件名为子模块名。}
+说明：降低接口使用者的编写难度。
+
+
+\subsection{头文件不要使用非习惯用法的扩展名，如.inc。}
+说明：目前很多产品中使用了.inc作为头文件扩展名，这不符合c语言的习惯用法。在使用.inc作为头文件扩展名的产品，习惯上用于标识此头文件为私有头文件。但是从产品的实际代码来看，这一条并没有被遵守，一个.inc文件被多个.c包含比比皆是。本规范不提倡将私有定义单独放在头文件中，具体见规则1。
+
+除此之外，使用.inc还导致source insight、Visual stduio等IDE工具无法识别其为头文件，导致很多功能不可用，如“跳转到变量定义处”。虽然可以通过配置，强迫IDE识别.inc为头文件，但是有些软件无法配置，如Visual Assist只能识别.h而无法通过配置识别.inc。
+
+
+\subsection{同一产品统一包含头文件排列方式。}
+包含次序标准化可增强可读性、避免隐藏依赖（hidden dependencies），次序如下：C库、C++库、其他库的.h、项目内的.h。
+
+项目内头文件应按照项目源代码目录树结构排列，并且避免使用UNIX文件路径.（当前目录）和..（父目录）。例如，google-awesome-project/src/base/logging.h应像这样被包含：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+#include "base/logging.h"
+\end{minted}
+
+示例：dir/foo.cpp的主要作用是执行或测试dir2/foo2.h的功能，foo.cpp中包含头文件的次序如下：
+\begin{verbatim}
+dir2/foo2.h（优先位置，详情如下）
+C系统文件
+C++系统文件
+其他库头文件
+本项目内头文件
+\end{verbatim}
+
+这种排序方式可有效减少隐藏依赖，我们希望每一个头文件独立编译。最简单的实现方式是将其作为第一个.h文件包含在对应的.cpp中。
+
+dir/foo.cpp和dir2/foo2.h通常位于相同目录下（像base/basictypes\_unittest.cpp和base/basictypes.h），但也可在不同目录下。
+
+相同目录下头文件按字母序是不错的选择。
+
+举例来说，google-awesome-project/src/foo/internal/fooserver.cpp的包含次序如下：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+#include "foo/public/fooserver.h" // 优先位置
+
+#include <sys/types.h>
+#include <unistd.h>
+
+#include <hash_map>
+#include <vector>
+
+#include "base/basictypes.h"
+#include "base/commandlineflags.h"
+#include "foo/public/bar.h
+\end{minted}
+
+
+\section{内联函数}
+只有当函数只有10行甚至更少时才会将其定义为内联函数（inline function）。
+
+\textbf{定义}：当函数被声明为内联函数之后，编译器可能会将其内联展开，无需按通常的函数调用机制调用内联函数。
+
+\textbf{优点}：当函数体比较小的时候，内联该函数可以令目标代码更加高效。对于存取函数（accessor、mutator） 以及其他一些比较短的关键执行函数。
+
+\textbf{缺点}：滥用内联将导致程序变慢，内联有可能是目标代码量或增或减，这取决于被内联的函数的大小。内联较短小的存取函数通常会减少代码量，但内联一个很大的函数（译者注： 如果编译器允许的话）将戏剧性的增加代码量。在现代处理器上，由于更好的利用指令缓存（instruction cache），小巧的代码往往执行更快。
+
+\textbf{结论}：一个比较得当的处理规则是，不要内联超过10行的函数。对于析构函数应慎重对待，析构函数往往比其表面看起来要长，因为有一些隐式成员和基类析构函数（如果有的话）被调用！
+
+另一有用的处理规则：内联那些包含循环或switch语句的函数是得不偿失的，除非在大多数情况下，这些循环或switch语句从不执行。
+
+重要的是，虚函数和递归函数即使被声明为内联的也不一定就是内联函数。通常，递归函数不应该被声明为内联的（译者注：递归调用堆栈的展开并不像循环那么简单，比如递归层数在编译时可能是未知的，大多数编译器都不支持内联递归函数）。析构函数内联的主要原因是其定义在类的定义中，为了方便抑或是对其行为给出文档。
+
+
+\section{-inl.h文件}
+复杂的内联函数的定义，应放在后缀名为-inl.h的头文件中。
+
+在头文件中给出内联函数的定义，可令编译器将其在调用处内联展开。然而，实现代码应完全放到.cpp文件中，我们不希望.h文件中出现太多实现代码，除非这样做在可读性和效率上有明显优势。
+
+如果内联函数的定义比较短小、逻辑比较简单，其实现代码可以放在.h文件中。例如，存取函数的实现理所当然都放在类定义中。出于实现和调用的方便，较复杂的内联函数也可以放到.h文件中，如果你觉得这样会使头文件显得笨重，还可以将其分离到单独的-inl.h中。这样即把实现和类定义分离开来，当需要时包含实现所在的-inl.h即可。
+
+-inl.h文件还可用于函数模板的定义，从而使得模板定义可读性增强。
+
+要提醒的一点是，-inl.h和其他头文件一样，也需要\#define保护。
+
+
+\section{函数参数顺序}
+定义函数时，参数顺序为：输入参数在前，输出参数在后。
+
+C/C++函数参数分为输入参数和输出参数两种，有时输入参数也会输出（译者注：值被修改时）。输入参数一般传值或常数引用（const references），输出参数或输入/输出参数为非常数指针（non-const pointers）。对参数排序时，将所有输入参数置于输出参数之前。不要仅仅因为是新添加的参数，就将其置于最后，而应该依然置于输出参数之前。
+
+这一点并不是必须遵循的规则，输入/输出两用参数（通常是类/结构体变量）混在其中，会使得规则难以遵循。
+
+
+\chapter{命名}
+
+
+\section{通用命名规则}
+\begin{itemize}
+  \item 名称应该具有意义，能反映其作用，通常不要简化；
+  \item 仅在缩写名称是公认、明确无岐义的情况下才使用，否则一律不使用缩写；
+  \item 不得使用汉语拼音；
+  \item 不要使用字母、数字、下划线之外的符号；
+  \item 用正确的反义词组命名具有互斥意义的变量或相反动作的函数等；例如：\\
+  add/remove  begin/end  create/destroy
+  \item 尽量避免名字中出现数字编号，除非逻辑上的确需要编号；
+  \item 标识符前不应添加模块、项目、产品、部门的名称作为前缀；
+  \item 重构或修改部分代码时,应保持和原有代码的命名风格一致。
+\end{itemize}
+
+
+\section{文件}
+\begin{itemize}
+  \item 文件名统一使用小写字母。这是因为不同操作系统对文件名大小写的处理上有区别，windows系列忽略大小写，Linux则区分大小写，所以干脆统一使用小写。
+  \item 构成文件名的单词间使用下划线来连接。
+  \item C++源文件使用.cpp结尾，头文件使用.h结尾。
+  \item 定义类的文件一般成对出现，文件名称与类名称相对应，例如类AnalyticalModel，与之对应的文件分别为：analytical\_model.h与analytical\_model.cpp。
+\end{itemize}
+
+
+\section{类}
+每个单词以大写字母开头，不使用下划线。结构、typeof与枚举也使用相同的命名规则。示例：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+// classes and structs
+class UrlTable { ...
+class UrlTableTester { ...
+struct UrlTableProperties { ...
+
+// typedefs
+typedef hash_map<UrlTableProperties *, string> PropertiesMap;
+
+// enums
+enum UrlTableErrors { ...
+\end{minted}
+
+类的实例，也就是对象的命名与变量的命名规则相同。
+
+
+\section{变量}
+\begin{itemize}
+  \item 一律使用小写字母，单词间用下划线相连。类成员变量以下划线结尾。例如：
+  \begin{minted}[linenos=true,frame=single,breaklines]{c++}
+initial_position
+initial_position_
+  \end{minted}
+  \item 结构的数据成员与普通变量命名规则一样，但不用在结尾添加下划线。例如：
+  \begin{minted}[linenos=true,frame=single,breaklines]{c++}
+struct TimeType {
+  IntType  year;
+  IntType  month;
+  IntType  day;
+  IntType  hour;
+  IntType  minute;
+  RealType second;
+};
+  \end{minted}
+  \item 全局变量使用“g\_”前缀，但通常情况下禁止使用全局变量。
+  \item 静态变量使用“s\_”前缀。
+  \item 禁止使用单个字母作为变量名，但允许定义i、j、k作为局部循环变量。
+  \item 不得使用匈牙利命名法。因其有碍代码重构。
+  \item 使用“名词”或“形容词+名词”的方式命名变量。
+\end{itemize}
+
+
+\section{常量}
+字母全部大写，单词间用下划线连接。例如：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+const int MINIMUM_NUMBER_OF_BYTES = 4;
+\end{minted}
+
+应避免使用\#define语句。应该使用const变量或枚举类型代替常量宏。（一个例外是当包含条件调试时可以使用\#define语句）。
+
+
+\section{方法/函数}
+\begin{itemize}
+  \item 每个方法和函数都执行一个动作，因此名称应明确其作用。名称应为动词，并以大写开头的混合大小写形式。例如：
+  \begin{minted}[linenos=true,frame=single,breaklines]{c++}
+OutputCalibrationData()
+Normalize()
+  \end{minted}
+  \item 推荐前缀：
+  \begin{itemize}
+    \item Is/Has/Can：问一些问题并返回布尔类型
+    \item Set/Get
+    \item Initialize：初始化一个对象
+    \item Compute：计算一些东西（简单的），或者使用下面的
+    \item Calculate：计算一些东西（复杂的）
+  \end{itemize}
+  \item 类的名称不应在方法名称中重复。例如：
+  \begin{minted}[linenos=true,frame=single,breaklines]{c++}
+Vector Normalize()  // NOT: Vector NormalizeVector()
+  \end{minted}
+  \item 内联函数可以使用小写字母与下划线组合的方式命名。见下一条的示例。
+  \item 存取函数（accessors and mutators）要与存取的变量名匹配。例如：
+  \begin{minted}[linenos=true,frame=single,breaklines]{c++}
+class MyClass {
+ public:
+  ...
+  int num_entries() const { return num_entries_; }
+  void set_num_entries(int num_entries) { num_entries_ = num_entries; }
+ private:
+  int num_entries_;
+};
+  \end{minted}
+  \item C函数使用小写字母与下划线组合的方式命名。例如：
+  \begin{minted}[linenos=true,frame=single,breaklines]{c++}
+get_best_fit_model()
+load_best_estimate_model()
+  \end{minted}
+
+  C++程序中使用C函数的情况很少，仅用于C++和C代码之间的接口。
+\end{itemize}
+\begin{itemize}
+  \item 命名规则与变量一样。
+  \item 传递类时，参数的名称可与其类型名称相同。但是，这不是必需的，在某些情况下甚至可能很麻烦。在这种情况下，名称应简洁。例如：
+  \begin{minted}[linenos=true,frame=single,breaklines]{c++}
+void SetForceModel(ForceModel *forceModel)
+void SetForceModel(ForceModel *fm)
+  \end{minted}
+\end{itemize}
+
+
+\section{命名空间}
+命名空间的名称全小写，用下划线连接，其命名基于项目名称和目录结构。例如：google\_awesome\_project。
+
+
+\section{枚举}
+命名规则与类相同。枚举值应全部大写,单词间以下划线相连，例如：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+enum Color {COLOR_RED, COLOR_GREEN, COLOR_BLUE};
+\end{minted}
+
+
+\section{宏定义}
+字母全部大写，用下划线连接，例如：
+\begin{minted}[linenos=true,frame=single,breaklines]{c++}
+#define PI_ROUNDED 3.0
+MY_EXCITING_ENUM_VALUE
+\end{minted}
